@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trilha de Estudo — IA para Não-Técnicos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;background:#fff;color:#111827;line-height:1.6;-webkit-font-smoothing:antialiased}
+.container{max-width:740px;margin:0 auto;padding:24px 20px}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+textarea{font-family:inherit;width:100%;min-height:80px;padding:10px 12px;border-radius:8px;border:1.5px solid #D1D5DB;font-size:14px;line-height:1.6;color:#1F2937;background:#fff;resize:vertical;box-sizing:border-box;transition:border-color .2s}
+textarea:focus{outline:none;border-color:#6366F1}
+textarea::placeholder{color:#9CA3AF}
+.back-btn{background:none;border:none;font-size:14px;color:#6B7280;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:20px;padding:8px 0}
+.back-btn:hover{color:#374151}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.phase-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:8px 0}
+.week-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px 18px;margin-left:16px;transition:all .2s ease;cursor:pointer}
+.week-card:hover{transform:translateX(3px)}
+.section-box{border-radius:12px;padding:18px 20px;margin-bottom:4px}
+.note-area{padding:8px 4px 16px}
+.tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;display:inline-block;margin-right:4px;margin-bottom:4px}
+.stats-badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;display:inline-block;margin:0 4px 4px 0}
+.dot{position:absolute;left:-32px;top:14px;width:28px;height:28px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;z-index:1}
+.timeline-line{position:absolute;left:15px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#2563EB,#7C3AED,#D97706,#DC2626,#059669,#0891B2,#6D28D9);border-radius:2px}
+.header-badge{display:inline-block;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;background:#F3F4F6;padding:6px 14px;border-radius:20px}
+.final-btn{margin-top:20px;padding:18px 22px;background:linear-gradient(135deg,#6D28D9,#4C1D95);border-radius:14px;cursor:pointer;transition:transform .2s;color:#fff;text-align:center;border:none;width:100%}
+.final-btn:hover{transform:translateY(-2px)}
+.deep-btn{margin-top:10px;padding:14px 18px;border-radius:14px;cursor:pointer;transition:transform .2s;color:#fff;text-align:center;border:none;width:100%}
+.deep-btn:hover{transform:translateY(-2px)}
+.final-card{border-radius:14px;padding:22px 24px;margin-bottom:24px}
+.synth-box{border-radius:12px;padding:18px 20px;margin:24px 0;border-left:4px solid}
+.lens-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:4px;text-transform:uppercase;letter-spacing:.3px}
+.hierarchy-label{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;margin-right:6px;text-transform:uppercase;letter-spacing:.5px}
+.status-tag{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;margin-left:4px}
+.resource-card{background:#fff;border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.resource-opt{background:#FAFAFA;border-radius:10px;padding:12px 16px;border:1px dashed #D1D5DB;margin-bottom:8px}
+.ri{font-size:12px;color:#6B7280;line-height:1.5;padding:8px 12px;border-radius:8px;margin-bottom:6px}
+.map-item{padding-left:12px;margin-bottom:10px;font-size:14px;color:#374151;line-height:1.6}
+.cal-week{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #F3F4F6}
+.cal-week:last-child{border-bottom:none}
+.cal-dot{width:24px;height:24px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:2px}
+.cal-dates{font-size:12px;font-weight:700;min-width:110px;flex-shrink:0}
+.cal-sched{font-size:12px;color:#6B7280;line-height:1.6}
+.cal-sched strong{color:#374151}
+.saved-indicator{position:fixed;bottom:20px;right:20px;background:#059669;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:100}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.fade-in{animation:fadeIn .3s ease}
+.slide-in{animation:slideIn .3s ease}
+</style>
+</head>
+<body>
+<div class="container" id="app"></div>
+<div class="saved-indicator" id="saved-ind">✓ Salvo</div>
+<script>
+// localStorage persistence
+function loadNotes(){try{return JSON.parse(localStorage.getItem("trilha-ia-notes"))||{}}catch(e){return{}}}
+function saveAllNotes(){try{localStorage.setItem("trilha-ia-notes",JSON.stringify(notes));showSaved()}catch(e){}}
+function showSaved(){const el=document.getElementById("saved-ind");el.style.opacity="1";setTimeout(()=>el.style.opacity="0",1200)}
+let notes=loadNotes();
+let saveTimer=null;
+function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveAllNotes,800)}
+
+// Calendar dates starting April 1 2026
+const CAL_START=new Date(2026,3,1);
+function weekDates(weekIdx){
+const s=new Date(CAL_START);s.setDate(s.getDate()+weekIdx*7);
+const e=new Date(s);e.setDate(e.getDate()+6);
+const fmt=d=>`${d.getDate()}/${d.getMonth()+1}`;
+return{start:s,end:e,label:`${fmt(s)} – ${fmt(e)}`,month:s.toLocaleString("pt-BR",{month:"short"})};
+}
+
+const ST={C:{bg:"#D1FAE5",color:"#065F46",label:"Consenso"},D:{bg:"#FEF3C7",color:"#92400E",label:"Debate"},S:{bg:"#FEE2E2",color:"#991B1B",label:"Especulação"}};
+const W=[
+{id:1,phase:"Fundamentos",pc:"#2563EB",title:"O que é IA e o que não é",
+obj:"Construir um mapa mental correto do que 'inteligência artificial' realmente significa hoje — separando o que existe do que é marketing e ficção.",
+order:"prática primeiro",
+schedule:"<strong>Seg manhã:</strong> Abra Claude/ChatGPT e faça a atividade prática (15min). Anote observações.<br><strong>Ter/Qua manhã:</strong> AI For Everyone módulos 1–2 (1h30).<br><strong>Qui/Sex manhã:</strong> Vídeo 3Blue1Brown (20min) + opcional se quiser.<br><strong>Sáb manhã:</strong> Escreva o entregável + responda as 3 perguntas (45min). Cole no Claude para feedback.",
+concepts:[
+{text:"Machine learning: sistemas que aprendem padrões em dados, não seguem regras programadas",level:"central",status:"C"},
+{text:"IA estreita (o que existe) vs. IA geral (o que não existe ainda)",level:"central",status:"C"},
+{text:"IA simbólica (regras) vs. IA baseada em dados (aprendizado estatístico) — paradigmas coexistentes",level:"nuance",status:"C"},
+{text:"'Inteligência' em IA é metáfora: o sistema otimiza funções matemáticas, não compreende",level:"nuance",status:"D"},
+{text:"O papel central da qualidade e quantidade de dados no desempenho",level:"aprofundamento",status:"C"}
+],
+req:[
+{n:"AI For Everyone — módulos 1 e 2",a:"Andrew Ng (Stanford / Google Brain)",t:"curso",free:1,url:"https://coursera.org/learn/ai-for-everyone",time:"1h30",
+why:"Melhor curso introdutório para não-técnicos. Ng fundou o Google Brain — pedagogia excepcionalmente clara.",
+lens:"Construtor / educador mainstream",
+limit:"Otimista tecnológico. Enfatiza oportunidades sobre riscos sociais.",
+tension:"Crawford (Atlas of AI): narrativa de 'ferramenta neutra' obscurece relações de poder."},
+{n:"But what is a neural network? (vídeo 1)",a:"3Blue1Brown (Grant Sanderson)",t:"youtube",free:1,url:"https://www.youtube.com/watch?v=aircAruvnKk",time:"20min",
+why:"Melhor visualização de redes neurais. Álgebra linear transformada em intuição visual.",
+lens:"Comunicação de ciência / matemática visual",
+limit:"Puramente técnico — nenhuma discussão de implicações sociais.",
+tension:"Mitchell: visualizações podem criar falsa sensação de compreensão."}
+],
+opt:[
+{n:"Elements of AI — capítulo 1",a:"Universidade de Helsinki",t:"curso",free:1,url:"https://elementsofai.com",time:"1h"},
+{n:"AI: A Guide for Thinking Humans — cap. 1–3",a:"Melanie Mitchell",t:"livro",free:0,time:"1h"}
+],
+practice:"Abra ChatGPT ou Claude (gratuito). Faça 5 perguntas sobre temas que você domina profissionalmente. Para cada resposta: (1) onde foi útil, (2) onde genérica, (3) onde errou. Reflita: o sistema 'entendeu' ou gerou texto estatisticamente provável?",
+deliv:"Parágrafo de 5–8 frases: o que é machine learning e por que é diferente de programação tradicional. Se não conseguir sem jargão, revise o material.",
+checks:[
+"Se alguém disser 'a IA entende o que você diz', que pressupostos essa frase carrega?",
+"Qual a diferença entre regras (programação) e padrões (ML)? O que implica sobre controle?",
+"Quando alguém usa 'inteligência artificial', que expectativas cria — e por que podem ser enganosas?"
+],tt:"3–4h"},
+
+{id:2,phase:"Fundamentos",pc:"#2563EB",title:"Deep learning e a revolução dos dados",
+obj:"Por que deep learning mudou tudo a partir de 2012: a tríade dados-computação-arquitetura e os limites dessa abordagem.",
+order:"prática primeiro",
+schedule:"<strong>Seg manhã:</strong> Assista 2 vídeos Two Minute Papers + anote observações (20min).<br><strong>Ter/Qua manhã:</strong> AI For Everyone módulos 3–4 (1h30).<br><strong>Qui/Sex manhã:</strong> 3Blue1Brown vídeos 2–3 (40min).<br><strong>Sáb manhã:</strong> Desenhe o diagrama + responda perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Deep learning: redes neurais com muitas camadas extraindo padrões cada vez mais abstratos",level:"central",status:"C"},
+{text:"Tríade: mais dados + mais computação + melhores arquiteturas",level:"central",status:"C"},
+{text:"Treinamento (aprende) vs. inferência (aplica)",level:"central",status:"C"},
+{text:"Scaling laws: modelos maiores melhoram, mas com retornos decrescentes e custos crescentes",level:"nuance",status:"D"},
+{text:"Escalar é suficiente para capacidades avançadas, ou há limites fundamentais? (Sutton vs. Marcus)",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"AI For Everyone — módulos 3 e 4",a:"Andrew Ng",t:"curso",free:1,url:"https://coursera.org/learn/ai-for-everyone",time:"1h30",
+why:"Completa o panorama com aplicações e limitações.",
+lens:"Construtor / educador",
+limit:"Pouca atenção a custos ambientais da escala.",
+tension:"Gary Marcus (NYU): deep learning tem limites fundamentais que escala não resolve."},
+{n:"But what is a neural network? (vídeos 2 e 3)",a:"3Blue1Brown",t:"youtube",free:1,url:"https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi",time:"40min",
+why:"Gradient descent e backpropagation em linguagem visual.",
+lens:"Comunicação de ciência",
+limit:"Silencioso sobre implicações.",
+tension:"Mitchell: clareza visual pode iludir sobre compreensão real."}
+],
+opt:[
+{n:"How AI Works — IBM Technology (3 vídeos)",a:"IBM Technology",t:"youtube",free:1,url:"https://www.youtube.com/@IBMTechnology",time:"30min"},
+{n:"Elements of AI — capítulos 2–4",a:"Universidade de Helsinki",t:"curso",free:1,url:"https://elementsofai.com",time:"1h30"}
+],
+practice:"Assista 2 vídeos Two Minute Papers sobre avanços recentes. Identifique: que IA? Que dados? Limitações mencionadas (ou omitidas)?",
+deliv:"Diagrama: ML → Deep Learning → dados, treinamento, inferência. Nota sobre 'escala'.",
+checks:[
+"Por que deep learning 'explodiu' nos anos 2010 se redes neurais existem desde os 1950?",
+"Se alguém disser 'IA aprende sozinha', que simplificações esconde?",
+"Qual pressuposto sustenta 'basta escalar'? Que críticos desafiam?"
+],tt:"3–4h",
+synthesis:{
+title:"Síntese: Fundamentos (Semanas 1–2)",
+understood:"O que é ML e deep learning; como redes neurais aprendem; treinamento vs. inferência; escala como motor da revolução.",
+tensions:"<strong>Consenso:</strong> deep learning funciona e escala melhorou resultados.<br><strong>Debate:</strong> escalar basta? Ng/Sutton sim; Marcus/Mitchell não.<br><strong>Eixo:</strong> Ng (oportunidade) vs. Mitchell (ceticismo) vs. Crawford (poder). Cada um ilumina algo diferente.",
+compare:"Ng vê ferramenta. Mitchell vê ilusão. Crawford vê poder."
+}},
+
+{id:3,phase:"Como LLMs Funcionam",pc:"#7C3AED",title:"LLMs por dentro: tokens, contexto e geração",
+obj:"Como ChatGPT e Claude geram texto — e por que previsão de token explica acertos e erros.",
+order:"prática primeiro",
+schedule:"<strong>Seg manhã:</strong> Faça os 3 testes práticos com Claude/ChatGPT (20min).<br><strong>Ter/Qua manhã:</strong> Generative AI for Everyone módulo 1 (1h30).<br><strong>Qui/Sex manhã:</strong> Vídeo Karpathy (1h, pode em 2 sessões).<br><strong>Sáb manhã:</strong> Entregável + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Tokens: unidades de texto (palavras ou fragmentos) processadas como números",level:"central",status:"C"},
+{text:"Janela de contexto: 'memória de trabalho' — tudo que o modelo considera ao gerar",level:"central",status:"C"},
+{text:"Geração = previsão probabilística do próximo token",level:"central",status:"C"},
+{text:"Temperatura: controla aleatoriedade (alta = criativa/arriscada, baixa = previsível)",level:"nuance",status:"C"},
+{text:"O modelo reproduz padrões estatísticos, não 'sabe' — explica acertos e invenções",level:"nuance",status:"C"},
+{text:"LLMs 'entendem' ou são 'papagaios estocásticos'? (Bender/Gebru vs. capacidades emergentes)",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"Generative AI for Everyone — módulo 1",a:"Andrew Ng",t:"curso",free:1,url:"https://coursera.org/learn/generative-ai-for-everyone",time:"1h30",
+why:"Ng explica LLMs para leigos melhor que qualquer outro recurso.",
+lens:"Educador / otimista informado",
+limit:"LLMs como ferramentas com problemas solucionáveis. Pouca atenção ao debate sobre compreensão.",
+tension:"Bender & Gebru ('Stochastic Parrots'): tamanho cria ilusão de compreensão."},
+{n:"Intro to Large Language Models",a:"Andrej Karpathy (ex-OpenAI)",t:"youtube",free:1,url:"https://www.youtube.com/watch?v=zjkBMFhNj_g",time:"1h",
+why:"Pesquisador de fronteira com dom raro de acessibilidade. Melhor intro técnica-acessível a LLMs.",
+lens:"Pesquisador / construtor",
+limit:"De dentro dos labs. Riscos sociais não são foco.",
+tension:"Mitchell: aparência de compreensão é enganosa; Crawford: custo de produção invisibilizado."}
+],
+opt:[
+{n:"What Is ChatGPT Doing…? (primeiras seções)",a:"Stephen Wolfram",t:"ensaio",free:1,url:"https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/",time:"1h"}
+],
+practice:"(1) Peça 3 variações de uma frase — observe diferenças. (2) Peça explicação de algo falso ('por que a Terra é plana'). (3) Pergunte 'você entende o que eu digo?' — avalie criticamente.",
+deliv:"1 parágrafo para colega: 'Como o ChatGPT gera resposta?' Use: token, probabilidade, contexto. + frase sobre 'parecer inteligente sem entender'.",
+checks:[
+"Se prevê próximo token, por que inventa fatos? O que revela?",
+"'ChatGPT entende sua pergunta' — que pressupostos carrega?",
+"Debate 'papagaio vs. compreensão' importa para uso prático ou é filosófico?"
+],tt:"3–4h"},
+
+{id:4,phase:"Como LLMs Funcionam",pc:"#7C3AED",title:"Alucinação, fine-tuning e RAG",
+obj:"Por que modelos erram, como são treinados, e o que fine-tuning e RAG fazem (e não fazem).",
+order:"prática primeiro",
+schedule:"<strong>Seg manhã:</strong> Teste de alucinação — peça 5 artigos acadêmicos, verifique (20min).<br><strong>Ter/Qua manhã:</strong> Generative AI for Everyone módulo 2 (1h30).<br><strong>Qui/Sex manhã:</strong> Melanie Mitchell cap. 10–12 (1h30, pode dividir).<br><strong>Sáb manhã:</strong> Tabela de conceitos + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Alucinação: texto plausível mas falso, porque o objetivo é gerar provável, não verdadeiro",level:"central",status:"C"},
+{text:"Pipeline: pré-treinamento → fine-tuning → RLHF",level:"central",status:"C"},
+{text:"RAG: busca externa antes de responder — reduz mas não elimina alucinações",level:"central",status:"C"},
+{text:"Limites: não verifica fatos, não raciocina como humano, sem memória entre conversas",level:"nuance",status:"C"},
+{text:"RLHF pode criar sycophancy e vieses de quem avalia",level:"nuance",status:"D"},
+{text:"Alucinação: bug solucionável ou propriedade estrutural?",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"Generative AI for Everyone — módulo 2",a:"Andrew Ng",t:"curso",free:1,url:"https://coursera.org/learn/generative-ai-for-everyone",time:"1h30",
+why:"Fine-tuning, RAG e limitações de forma prática.",
+lens:"Educador / construtor",
+limit:"Alucinação como problema técnico solucionável. Bender: é propriedade emergente.",
+tension:"Mitchell questiona se 'resolver alucinação' é mais difícil do que labs admitem."},
+{n:"AI: A Guide for Thinking Humans — cap. 10–12",a:"Melanie Mitchell (Santa Fe Institute)",t:"livro",free:0,time:"1h30",
+why:"Desmonta hype sem cinismo. 'Entender' em IA ≠ entender humano.",
+lens:"Pesquisadora independente / cética informada",
+limit:"Viés para cautela, pode subestimar avanços.",
+tension:"Onde Ng/Karpathy veem capacidades emergentes, Mitchell vê padrões imitando compreensão."}
+],
+opt:[
+{n:"Hallucination is Inevitable (AI Explained)",a:"AI Explained",t:"youtube",free:1,url:"https://www.youtube.com/@aiexplained-official",time:"20min"},
+{n:"What are AI Agents? (IBM)",a:"IBM Technology",t:"youtube",free:1,url:"https://www.youtube.com/@IBMTechnology",time:"15min"}
+],
+practice:"Peça 5 artigos acadêmicos sobre tema que conhece. Verifique no Google Scholar. Peça novamente com busca web. Compare.",
+deliv:"Tabela: Conceito | O que é | Por que importa | Debate — para: alucinação, fine-tuning, RAG, RLHF, contexto.",
+checks:[
+"Alucinação é bug ou propriedade estrutural? Posição de cada lado?",
+"RLHF melhora modelos — mas que problemas pode introduzir?",
+"'ChatGPT pesquisou isso' (sem busca web) — que erro de compreensão?"
+],tt:"3–4.5h",
+synthesis:{
+title:"Síntese: Como LLMs Funcionam (Semanas 3–4)",
+understood:"Geração por tokens; contexto, temperatura; alucinação; fine-tuning, RLHF, RAG; limites fundamentais.",
+tensions:"<strong>Consenso:</strong> geração por tokens; alucinação real e significativa; RLHF ajuda mas não resolve tudo.<br><strong>Debate:</strong> LLMs 'entendem'? Alucinação solucionável? Ng sim; Mitchell/Bender estrutural.<br><strong>Especulação:</strong> se alucinação for fundamental, limites de LLMs podem ser mais rígidos que o mercado assume.",
+compare:"Ng (solução técnica) vs. Mitchell (ceticismo) vs. Bender/Gebru (crítica fundamental)."
+}},
+
+{id:5,phase:"Uso Prático",pc:"#D97706",title:"Prompt engineering e avaliação crítica",
+obj:"Usar IA de forma eficiente e crítica: bons prompts, avaliação de confiabilidade, iteração.",
+order:"prática primeiro",
+schedule:"<strong>Seg manhã:</strong> Faça os 4 exercícios práticos com tarefa real do trabalho (30min).<br><strong>Ter/Qua manhã:</strong> Generative AI for Everyone módulo 3 (1h).<br><strong>Qui/Sex manhã:</strong> Anthropic Prompt Engineering Guide (1h).<br><strong>Sáb manhã:</strong> Monte o mini-guia pessoal + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Anatomia: contexto, tarefa, formato, restrições",level:"central",status:"C"},
+{text:"Avaliação: verificação factual, coerência interna, viés de confirmação",level:"central",status:"C"},
+{text:"Técnicas: few-shot, chain-of-thought, role-playing",level:"nuance",status:"C"},
+{text:"Quando útil (brainstorming, rascunhos) vs. arriscada (alto risco, fatos precisos)",level:"nuance",status:"C"},
+{text:"Meta-habilidade: calibrar confiança no output — ceticismo construtivo",level:"aprofundamento",status:"C"}
+],
+req:[
+{n:"Generative AI for Everyone — módulo 3",a:"Andrew Ng",t:"curso",free:1,url:"https://coursera.org/learn/generative-ai-for-everyone",time:"1h",
+why:"Encerra melhor curso gratuito com foco em aplicações.",
+lens:"Educador / produtividade",
+limit:"Prompting como habilidade técnica, sem dimensão crítica.",
+tension:"Mitchell/Bender: 'melhor prompt' não resolve falhas estruturais."},
+{n:"Anthropic Prompt Engineering Guide",a:"Anthropic",t:"guia",free:1,url:"https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",time:"1h",
+why:"Guia oficial com exemplos práticos. Material do fabricante — ler com essa consciência.",
+lens:"Fabricante / documentação técnica",
+limit:"Anthropic sobre Anthropic. Não enfatiza limitações.",
+tension:"Necessidade de prompt elaborado é evidência de fragilidade do sistema (Mitchell)."}
+],
+opt:[
+{n:"Google AI Essentials — módulo de prompting",a:"Google",t:"curso",free:1,url:"https://coursera.org/google-ai-essentials",time:"1h"},
+{n:"Prompt Engineering Guide (DAIR.AI)",a:"DAIR.AI",t:"guia",free:1,url:"https://www.promptingguide.ai/",time:"30min"}
+],
+practice:"<strong>4 exercícios concretos:</strong><br><br><strong>Pesquisa com verificação:</strong> Peça resumo das 'principais críticas ao EU AI Act'. Busque fontes originais. O que acertou? Omitiu?<br><br><strong>Escrita e revisão:</strong> Peça rascunho de email profissional delicado. Revise tom. Reescreva você e compare.<br><br><strong>Organização:</strong> Cole texto longo, peça resumo de 3 frases + decisões pendentes + lacunas. Avalie.<br><br><strong>Pensamento crítico:</strong> Peça argumentos a favor E contra uma decisão sua. Substanciais ou genéricos?",
+deliv:"Mini-guia: 5 regras de prompting + 3 regras de avaliação crítica.",
+checks:[
+"Prompt elaborado para boa resposta = habilidade sua ou limitação do sistema?",
+"Como distingue resposta correta de uma que apenas parece correta?",
+"Que tarefa se beneficia mais de IA — e em qual a delegação é perigosa?"
+],tt:"3–4h"},
+
+{id:6,phase:"Uso Prático",pc:"#D97706",title:"Aplicações profissionais e segurança",
+obj:"Casos de uso concretos com foco em segurança: o que compartilhar, o que proteger.",
+order:"prática primeiro",
+schedule:"<strong>Seg manhã:</strong> Faça a classificação de 10 tarefas do trabalho (20min).<br><strong>Ter/Qua manhã:</strong> Google AI Essentials (2h, pode dividir).<br><strong>Qui/Sex manhã:</strong> Leia políticas de privacidade Claude/ChatGPT (30min).<br><strong>Sáb manhã:</strong> Protocolo pessoal + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Aplicações: redação, análise, pesquisa, brainstorming — todas com revisão humana",level:"central",status:"C"},
+{text:"Privacidade varia entre plataformas, planos e configurações",level:"central",status:"C"},
+{text:"Regra de ouro: se não colaria num post-it na recepção, não cole num prompt",level:"central",status:"C"},
+{text:"Automação assistida (humano revisa) vs. automação cega (sistema decide)",level:"nuance",status:"C"},
+{text:"Políticas corporativas de IA: muitas existem, poucas adequadas",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"Google AI Essentials (completo)",a:"Google",t:"curso",free:1,url:"https://coursera.org/google-ai-essentials",time:"2h",
+why:"Melhor recurso gratuito sobre uso concreto no dia a dia.",
+lens:"Big tech / adoção",
+limit:"Google incentivando adoção. Não problematiza dependência.",
+tension:"O'Neil/Crawford: pressão por adoção atropela análise de riscos."},
+{n:"Política de privacidade — Claude e ChatGPT",a:"Anthropic / OpenAI",t:"guia",free:1,url:"https://support.anthropic.com/en/collections/4078534-privacy-legal",time:"30min",
+why:"Obrigatório antes de usar IA para trabalho.",
+lens:"Documentação legal",
+limit:"Escritas para proteger a empresa. Atenção ao que não é dito.",
+tension:"Distância entre garantia e percepção do usuário é risco subestimado."}
+],
+opt:[
+{n:"How companies are using AI responsibly (MIT Tech Review)",a:"MIT Technology Review",t:"jornalismo",free:1,url:"https://www.technologyreview.com/topic/artificial-intelligence/",time:"30min"}
+],
+practice:"<strong>Classificação profissional:</strong><br>10 tarefas reais → (A) uso livre, (B) com revisão, (C) não usar.<br>Para cada B: quem revisa? Para cada C: por quê?<br>Depois: suas Bs são realmente Bs?",
+deliv:"Protocolo pessoal de uso de IA: 1 página sobre compartilhar, verificar, evitar.",
+checks:[
+"Contrato confidencial no ChatGPT — que riscos concretos?",
+"Pressão por 'produtividade com IA' pode levar a que decisões ruins?",
+"'IA me ajudou a pensar' vs. 'IA decidiu por mim' — por que a distinção importa?"
+],tt:"3–4h",
+synthesis:{
+title:"Síntese: Uso Prático (Semanas 5–6)",
+understood:"Prompts eficientes; avaliação crítica; quando usar/não usar; política de dados; protocolo de uso.",
+tensions:"<strong>Consenso:</strong> IA útil para rascunhos, pesquisa, organização. Revisão humana inegociável.<br><strong>Debate:</strong> pressão por adoção ignora riscos? Google/Ng (produtividade) vs. O'Neil/Crawford (quem se beneficia mais?).<br><strong>Prática:</strong> maturidade = usar eficientemente + ceticismo ativo.",
+compare:"Google (adoção) vs. O'Neil/Crawford (perguntas que fariam sobre as mesmas práticas)."
+}},
+
+{id:7,phase:"Riscos Concretos",pc:"#DC2626",title:"Viés, discriminação e erros sistêmicos",
+obj:"Como IA amplifica preconceitos, com casos documentados. Riscos presentes.",
+order:"leitura primeiro",
+schedule:"<strong>Seg–Qua manhã:</strong> Weapons of Math Destruction cap. 1–5 (2h divididas).<br><strong>Qui/Sex manhã:</strong> Reportagem Karen Hao (30min).<br><strong>Sáb manhã:</strong> Teste de viés prático + entregável + perguntas (1h). Cole no Claude.",
+concepts:[
+{text:"Viés algorítmico: IA reflete e amplifica preconceitos dos dados",level:"central",status:"C"},
+{text:"Discriminação por proxy: CEP, escola, nome codificam raça, gênero, classe",level:"central",status:"C"},
+{text:"Casos: COMPAS, Amazon recrutamento, Optum saúde — viés medido",level:"central",status:"C"},
+{text:"'Mais dados' nem sempre resolve: dados desiguais reproduzem desigualdade",level:"nuance",status:"C"},
+{text:"Viés: problema técnico solucionável ou sintoma social?",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"Weapons of Math Destruction — cap. 1–5",a:"Cathy O'Neil (PhD Harvard)",t:"livro",free:0,time:"2h",
+why:"Livro mais importante sobre algoritmos opacos prejudicando pessoas reais.",
+lens:"Matemática / ativista informada",
+limit:"Foco nos piores casos, não é balanço custo-benefício — é alarme.",
+tension:"Engenheiros veem viés como solucionável tecnicamente. O'Neil: o problema é estrutural."},
+{n:"How Facebook got addicted to spreading misinformation",a:"Karen Hao (MIT Tech Review)",t:"jornalismo",free:1,url:"https://www.technologyreview.com/2021/03/11/1020600/facebook-responsible-ai-misinformation/",time:"30min",
+why:"Acesso interno ao time de 'IA responsável'. Prioridades comerciais derrotaram ética.",
+lens:"Jornalismo investigativo",
+limit:"Estudo de caso de uma empresa. Padrão lucro > ética é recorrente mas não universal.",
+tension:"O'Neil mostra o dano; Hao mostra por que empresas não consertam."}
+],
+opt:[
+{n:"Atlas of AI — cap. 1",a:"Kate Crawford",t:"livro",free:0,time:"1h"},
+{n:"Robert Miles — AI safety basics (3 vídeos)",a:"Robert Miles",t:"youtube",free:1,url:"https://www.youtube.com/@RobertMilesAI",time:"30min"}
+],
+practice:"Cartas de recomendação para 3 perfis idênticos, mudando nome/gênero. Depois currículos com nomes de etnias diferentes. Documente diferenças.",
+deliv:"1 página: '3 riscos de viés que mais me preocupam, por quê, e o que eu faria diferente'.",
+checks:[
+"O'Neil: 'armas de destruição matemática'. Que pressupostos? Contra-argumentos válidos?",
+"Viés reflete sociedade desigual — solução técnica, política ou ambas?",
+"'Algoritmo é objetivo porque é matemático' — que erro de raciocínio?"
+],tt:"3–4h"},
+
+{id:8,phase:"Riscos Concretos",pc:"#DC2626",title:"Dependência, automação e uso indevido",
+obj:"Automation bias, deskilling, deepfakes, desinformação. Riscos do dia a dia.",
+order:"leitura primeiro",
+schedule:"<strong>Seg–Qua manhã:</strong> Weapons of Math Destruction cap. 6–10 (2h divididas).<br><strong>Qui/Sex manhã:</strong> Machines of Loving Grace — primeiras seções (1h).<br><strong>Sáb manhã:</strong> Exercício de reflexão + entregável + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Automation bias: aceitar output sem questionar — mesmo errado",level:"central",status:"C"},
+{text:"Deskilling: perda de habilidades por delegação excessiva",level:"central",status:"C"},
+{text:"Uso indevido: plágio, desinformação, deepfakes — riscos presentes",level:"central",status:"C"},
+{text:"Responsabilidade difusa: quem responde quando automação falha?",level:"nuance",status:"D"},
+{text:"Foco em riscos futuros desvia de danos presentes? (Gebru) Ou ambos importam? (Christian)",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"Weapons of Math Destruction — cap. 6–10",a:"Cathy O'Neil",t:"livro",free:0,time:"2h",
+why:"Efeitos sistêmicos: ciclos de feedback que pioram situação dos vulneráveis.",
+lens:"Ativismo informado por matemática",
+limit:"Foco nos piores cenários. Alarme, não balanço.",
+tension:"O'Neil (riscos presentes) vs. Russell/Amodei (riscos futuros)."},
+{n:"Machines of Loving Grace (primeiras seções)",a:"Dario Amodei (CEO Anthropic)",t:"ensaio",free:1,url:"https://darioamodei.com/machines-of-loving-grace",time:"1h",
+why:"Perspectiva de dentro dos labs. Reconhece riscos sem catastrofismo.",
+lens:"CEO de lab / otimista cauteloso",
+limit:"Lidera empresa que vende IA. Otimismo alinhado com interesses.",
+tension:"Onde O'Neil/Crawford veem dano, Amodei vê potencial. Quem tem mais a perder se errar?"}
+],
+opt:[{n:"The Alignment Problem — cap. 1–3",a:"Brian Christian",t:"livro",free:0,time:"1h30"}],
+practice:"Decisão importante recente: (1) Onde IA ajudaria? (2) Pioraria? (3) Que info não teria? (4) Se delegasse tudo, maior risco?",
+deliv:"5 sinais de dependência excessiva + 5 sinais de uso saudável. Justifique.",
+checks:[
+"Gebru vs. Amodei sobre riscos presentes vs. futuros — qual te convence mais?",
+"Automation bias ubíquo + IA onipresente = que efeito cumulativo em instituições?",
+"Algoritmo opaco decidindo crédito vs. humano opaco — o que muda?"
+],tt:"3–4h",
+synthesis:{
+title:"Síntese: Riscos Concretos (Semanas 7–8)",
+understood:"Viés na prática; automation bias/deskilling; riscos presentes vs. hipotéticos; responsabilidade opaca; uso indevido.",
+tensions:"<strong>Consenso:</strong> viés algorítmico documentado e significativo. Automation bias comprovado.<br><strong>Debate:</strong> riscos presentes vs. futuros. Viés: técnico ou estrutural?<br><strong>Eixo:</strong> O'Neil (dano presente) vs. Amodei (potencial + risco) vs. Gebru (poder e desigualdade).",
+compare:"O'Neil (armas) vs. Amodei (construtor responsável) vs. Gebru (dano + poder)."
+}},
+
+{id:9,phase:"Visão Sistêmica",pc:"#059669",title:"Ética, impacto social e governança",
+obj:"Emprego, regulação, concentração de poder, custos ambientais.",
+order:"leitura primeiro",
+schedule:"<strong>Seg–Qui manhã:</strong> The Coming Wave cap. 1–6 (2h30 divididas em 4 sessões).<br><strong>Sex manhã:</strong> AI Safety Report Executive Summary (30min).<br><strong>Sáb manhã:</strong> Entregável + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"IA transforma tarefas, não substitui 'empregos inteiros' facilmente — efeito depende de políticas",level:"central",status:"D"},
+{text:"Pouquíssimas empresas controlam modelos mais potentes — assimetria de poder sem precedentes",level:"central",status:"C"},
+{text:"EU AI Act, EUA, Brasil — abordagens muito diferentes",level:"central",status:"C"},
+{text:"Data centers: ~415 TWh em 2024, dobrando até 2030",level:"nuance",status:"C"},
+{text:"'IA como eletricidade' (Ng) vs. 'IA como arma nuclear' (Suleyman) — metáfora molda política",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"The Coming Wave — cap. 1–6",a:"Mustafa Suleyman (cofundador DeepMind)",t:"livro",free:0,time:"2h30",
+why:"Arquiteto da IA moderna. Desafio central = contenção da 'onda'.",
+lens:"Construtor / governança",
+limit:"Defende contenção enquanto constrói — contradição comum entre líderes de IA.",
+tension:"Ng: 'eletricidade'. Suleyman: 'onda'. Metáfora molda tudo."},
+{n:"International AI Safety Report 2025 (Exec. Summary)",a:"Yoshua Bengio et al.",t:"relatório",free:1,url:"https://arxiv.org/abs/2510.13653",time:"30min",
+why:"70+ coautores, Prêmio Turing. Mais próximo de consenso científico.",
+lens:"Consenso acadêmico",
+limit:"Conservador por design. Exclui extremos.",
+tension:"Yampolskiy (controle impossível) vs. LeCun (preocupação exagerada). Relatório busca o meio."}
+],
+opt:[
+{n:"AI Superpowers — cap. 1–4",a:"Kai-Fu Lee",t:"livro",free:0,time:"1h30"},
+{n:"AI Safety Index 2025",a:"Future of Life Institute",t:"relatório",free:1,url:"https://futureoflife.org/ai-safety-index-summer-2025/",time:"30min"}
+],
+practice:"Sua empresa tem política de IA? Avalie. Se não, esboce 5 pontos + resistências de cada.",
+deliv:"1 página: 'O que minha profissão deveria fazer sobre IA'. Oportunidades, riscos, tensão produtividade vs. precaução.",
+checks:[
+"'Eletricidade' vs. 'arma nuclear' — qual te convence? O que revela sobre seus pressupostos?",
+"5 empresas controlando maiores modelos: mercado, segurança ou democracia?",
+"Regular cedo ou tarde — qual erro mais perigoso? O que aconteceu com redes sociais?"
+],tt:"3.5–4.5h"},
+
+{id:10,phase:"Visão Sistêmica",pc:"#059669",title:"Riscos de longo prazo e debates abertos",
+obj:"Alinhamento, superinteligência, corrida armamentista. Consenso vs. especulação.",
+order:"leitura primeiro",
+schedule:"<strong>Seg–Qua manhã:</strong> Human Compatible cap. 1–5 (2h divididas).<br><strong>Qui/Sex manhã:</strong> Robert Miles vídeos 1–5 (1h).<br><strong>Sáb manhã:</strong> Análise de artigo + entregável + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Alinhamento: garantir que sistemas façam o que queremos em situações imprevistas",level:"central",status:"D"},
+{text:"Quanto mais poderoso o sistema, mais consequências de erro de alinhamento",level:"central",status:"C"},
+{text:"Corrida entre empresas e governos pressiona sacrifício de segurança",level:"central",status:"C"},
+{text:"Espectro: LeCun ('prematuro') → Bengio ('real') → Russell ('redesenho') → Yampolskiy ('impossível')",level:"nuance",status:"D"},
+{text:"Quem alerta sobre risco existencial pode beneficiar-se de regulação que favorece incumbentes",level:"nuance",status:"C"},
+{text:"Debate riscos futuros desvia de danos presentes? (Gebru) Ou são o mesmo problema? (Christian)",level:"aprofundamento",status:"D"}
+],
+req:[
+{n:"Human Compatible — cap. 1–5",a:"Stuart Russell (UC Berkeley)",t:"livro",free:0,time:"2h",
+why:"Coautor do livro-texto de IA mais usado. Peso institucional e rigor incomuns.",
+lens:"Pesquisador senior / redesenho",
+limit:"Investido na tese de risco existencial. LeCun discorda fortemente.",
+tension:"Russell vs. LeCun: tensão mais produtiva da área. 'Sem redesenho, perderemos controle' vs. 'ficção científica'."},
+{n:"Robert Miles — AI Alignment (vídeos 1–5)",a:"Robert Miles",t:"youtube",free:1,url:"https://www.youtube.com/@RobertMilesAI",time:"1h",
+why:"Melhor explicação de alinhamento para leigos.",
+lens:"Comunicador / comunidade AI safety",
+limit:"Prioridades da comunidade safety. Gebru: supervaloriza risco existencial.",
+tension:"Miles: alinhamento é central. O'Neil/Gebru: o central é poder e desigualdade."}
+],
+opt:[
+{n:"Situational Awareness (primeiras seções)",a:"Leopold Aschenbrenner",t:"ensaio",free:1,url:"https://situational-awareness.ai",time:"1h"},
+{n:"Entrevista Dario Amodei",a:"Dwarkesh Patel",t:"youtube",free:1,url:"https://www.youtube.com/@DwarkeshPatel",time:"1h"}
+],
+practice:"Artigo com afirmação forte sobre futuro da IA. Analise: tese, evidência, lacunas, agenda, tensão com qual autor.",
+deliv:"Mapeie 3+ posições sobre futuro da IA com nomes e pressupostos.",
+checks:[
+"Russell vs. LeCun — como avalia desacordo entre especialistas sem expertise técnica?",
+"Empresas vendendo IA pedindo regulação — que incentivos além de segurança?",
+"Risco existencial vs. dano presente: falsa dicotomia ou tensão real?"
+],tt:"3–4h",
+synthesis:{
+title:"Síntese: Visão Sistêmica (Semanas 9–10)",
+understood:"Alinhamento; concentração de poder; espectro de posições; metáforas e política; agendas.",
+tensions:"<strong>Consenso:</strong> concentração de poder real; corrida pressiona segurança; regulação necessária.<br><strong>Debate:</strong> alinhamento é central ou distração? Risco existencial urgente ou prematuro?<br><strong>Especulação:</strong> superinteligência descontrolada; timelines para AGI; se IA pode ser 'contida'.",
+compare:"Russell (redesenho) vs. LeCun (exagero) vs. Suleyman (contenção) vs. Gebru (dano presente) vs. Bengio (consenso)."
+}},
+
+{id:11,phase:"Geopolítica",pc:"#0891B2",title:"Chips, energia e corrida global",
+obj:"Hardware, energia, minerais. Quem controla infraestrutura controla o futuro.",
+order:"leitura primeiro",
+schedule:"<strong>Seg–Qui manhã:</strong> Chip War cap. 1–8 (2h30 divididas em 4 sessões).<br><strong>Sex manhã:</strong> IEA Executive Summary (30min).<br><strong>Sáb manhã:</strong> Mini-briefing + perguntas (45min). Cole no Claude.",
+concepts:[
+{text:"Semicondutores: recurso estratégico mais crítico do século XXI — cadeia concentrada",level:"central",status:"C"},
+{text:"Taiwan (TSMC): ~90% dos chips avançados. Ponto único de falha geopolítico",level:"central",status:"C"},
+{text:"Data centers: ~415 TWh em 2024, dobrando até 2030",level:"central",status:"C"},
+{text:"Controles de exportação EUA → China: arma econômica, consequências incertas",level:"nuance",status:"C"},
+{text:"Controles vão conter China ou acelerar alternativas? Precedente ambíguo",level:"aprofundamento",status:"S"}
+],
+req:[
+{n:"Chip War — cap. 1–8",a:"Chris Miller (Tufts)",t:"livro",free:0,time:"2h30",
+why:"FT Business Book of the Year. Semicondutores como recurso mais disputado.",
+lens:"Historiador / geopolítica",
+limit:"Ângulo americano. Perspectiva chinesa/europeia com menos espaço.",
+tension:"Sem chips não há IA — desmonta 'só software importa'."},
+{n:"Energy and AI — IEA 2025 (Exec. Summary)",a:"IEA",t:"relatório",free:1,url:"https://iea.org/reports/energy-and-ai",time:"30min",
+why:"Dados, não opinião. Custo real de IA em energia.",
+lens:"Instituição intergovernamental / dados",
+limit:"Conservadora em projeções.",
+tension:"Dados criam tensão com promessas corporativas de carbono neutro."}
+],
+opt:[
+{n:"Asianometry — TSMC",a:"Asianometry",t:"youtube",free:1,url:"https://www.youtube.com/@Asianometry",time:"40min"},
+{n:"Wendover — data centers",a:"Wendover Productions",t:"youtube",free:1,url:"https://www.youtube.com/@Wendoverproductions",time:"20min"}
+],
+practice:"2 notícias recentes sobre Nvidia/TSMC/data centers/regulação. Para cada: fontes? Perspectiva ausente? Capacidade real vs. marketing?",
+deliv:"Mini-briefing 1 página: mapa de poder global de IA.",
+checks:[
+"Crise no Estreito de Taiwan — consequências para IA global? Risco teórico ou concreto?",
+"Empresa de IA 'carbon neutral' — o que dados da IEA sugerem?",
+"Controles de exportação: arma eficaz ou efeito bumerangue?"
+],tt:"3.5–4.5h",
+synthesis:{
+title:"Síntese: Geopolítica (Semana 11)",
+understood:"Hardware importa tanto quanto software; TSMC/Taiwan; custo energético; controles como arma geopolítica.",
+tensions:"<strong>Consenso:</strong> semicondutores estratégicos; custo energético significativo; concentração é vulnerabilidade.<br><strong>Debate:</strong> controles vão funcionar?<br><strong>Especulação:</strong> conflito em Taiwan; alternativas a TSMC; impacto climático longo prazo.",
+compare:"Miller (geopolítica) vs. IEA (energia) vs. Crawford (custos invisíveis). Juntos: IA não é 'apenas software'."
+}},
+
+{id:12,phase:"Consolidação",pc:"#6D28D9",title:"Síntese e senso crítico permanente",
+obj:"Consolidar tudo, rotina de atualização, framework duradouro.",
+order:"prática primeiro",
+schedule:"<strong>Seg–Ter manhã:</strong> Leia 4 edições Import AI (1h).<br><strong>Qua–Qui:</strong> Ouça 2 episódios Hard Fork (trânsito, almoço, etc.).<br><strong>Sex manhã:</strong> Monte rotina pessoal + análise de notícia (30min).<br><strong>Sáb manhã:</strong> Projeto final — 2–3 páginas (1h30). Cole no Claude para feedback final.",
+concepts:[
+{text:"Síntese: fundamentos + riscos + ética + geopolítica integrados",level:"central",status:"C"},
+{text:"15–30 min/semana com qualidade > 3h/semana com mediocridade",level:"central",status:"C"},
+{text:"Framework: credenciais, agenda, evidência, nuance, o que não diz",level:"central",status:"C"},
+{text:"Calibrar: consenso vs. posição de campo vs. especulação vs. hype",level:"nuance",status:"C"},
+{text:"Mudar de ideia quando evidência muda, sem oscilar entre pânico e indiferença",level:"aprofundamento",status:"C"}
+],
+req:[
+{n:"Import AI — 4 edições recentes",a:"Jack Clark (cofundador Anthropic)",t:"newsletter",free:1,url:"https://importai.substack.com",time:"1h",
+why:"Newsletter mais respeitada. Análise densa, sem hype.",
+lens:"Insider / policy",
+limit:"Dentro da Anthropic. Desigualdade e meio ambiente com menos peso.",
+tension:"Complementa Hard Fork. Contrasta com MIT Tech Review (mais disposto a criticar labs)."},
+{n:"Hard Fork — 2 episódios recentes",a:"Kevin Roose + Casey Newton (NYT)",t:"podcast",free:1,time:"1h30",
+why:"Melhor podcast de IA para não-técnicos.",
+lens:"Jornalismo / equilíbrio",
+limit:"Novidades > profundidade estrutural.",
+tension:"Complementa Import AI (denso) e O'Neil/Crawford (crítico). Você agora ouve com mais profundidade."}
+],
+opt:[
+{n:"The Batch",a:"Andrew Ng",t:"newsletter",free:1,url:"https://deeplearning.ai/the-batch/",time:"20min"},
+{n:"AI Explained — vídeo recente",a:"AI Explained",t:"youtube",free:1,url:"https://www.youtube.com/@aiexplained-official",time:"20min"}
+],
+practice:"<strong>3 exercícios finais:</strong><br><br><strong>Rotina:</strong> 1 newsletter + 1 podcast + 1 mensal. Na agenda. < 30 min/semana.<br><br><strong>Análise:</strong> Notícia recente. Capacidade real ou marketing? Lente? O que não diz?<br><br><strong>Síntese oral:</strong> Explique em 3 min para alguém: como funciona, onde falha, o que é debate aberto.",
+deliv:"Projeto final: 2–3 páginas — 'O que eu entendo sobre IA hoje'. Cole no Claude para feedback final da trilha.",
+checks:[
+"'IA vai tomar meu emprego?' — resposta com nuance sem evasão?",
+"Que perguntas faz automaticamente ao ler notícia sobre IA?",
+"'IA é incrível' E 'IA é perigosa' são AMBAS simplificações — como explicaria?"
+],tt:"3–4h",
+synthesis:{
+title:"Síntese Final",
+understood:"Como LLMs funcionam; uso seguro; viés e automação; espectro de riscos; dimensão material; avaliação de fontes.",
+tensions:"<strong>Tensões da trilha:</strong><br>(1) Capacidade vs. compreensão [Consenso parcial]<br>(2) Oportunidade vs. risco [Consenso: ambos reais]<br>(3) Riscos presentes vs. futuros [Debate]<br>(4) Narrativa vs. infraestrutura [Consenso]<br>(5) Regulação vs. inovação [Debate]",
+compare:"Ng: ferramenta. Mitchell: ilusão. O'Neil: arma. Crawford: poder. Russell: risco existencial. LeCun: exagero. Suleyman: onda. Gebru: dano ignorado. Nenhum completamente certo. Todos iluminam algo. Mantenha em tensão produtiva."
+}}
+];
+
+const FL={
+concepts:[
+{c:"Machine learning",d:"Aprendizado de padrões em dados, não regras programadas."},
+{c:"Deep learning",d:"Redes neurais profundas, representações abstratas."},
+{c:"LLM",d:"Prevê próximo token — otimiza verossimilhança, não verdade."},
+{c:"Tokens e contexto",d:"Unidade de processamento e limite de 'memória de trabalho'."},
+{c:"Alucinação",d:"Informação plausível mas falsa, com total confiança."},
+{c:"Fine-tuning e RLHF",d:"Ajuste pós-treinamento. RLHF pode criar sycophancy."},
+{c:"RAG",d:"Busca externa antes de responder. Reduz (não elimina) alucinações."},
+{c:"Viés algorítmico",d:"Amplifica preconceitos dos dados. Discriminação por proxy documentada."},
+{c:"Alinhamento",d:"Garantir que sistemas façam o que queremos. Dificuldade cresce com capacidade."},
+{c:"Automation bias",d:"Aceitar output automatizado sem questionar."}
+],
+sources:[
+{n:"Andrew Ng",r:"Stanford",l:"Construtor / educador"},
+{n:"Melanie Mitchell",r:"Santa Fe Institute",l:"Cética informada"},
+{n:"Stuart Russell",r:"UC Berkeley",l:"Safety / redesenho"},
+{n:"Yann LeCun",r:"Meta AI",l:"Cético sobre risco existencial"},
+{n:"Yoshua Bengio",r:"Mila / Prêmio Turing",l:"Consenso cauteloso"},
+{n:"Dario Amodei",r:"CEO Anthropic",l:"Construtor / safety-first"},
+{n:"Cathy O'Neil",r:"PhD Harvard",l:"Crítica / dano presente"},
+{n:"Kate Crawford",r:"Microsoft Research",l:"Crítica estrutural"},
+{n:"Timnit Gebru",r:"DAIR Institute",l:"Justiça social"},
+{n:"Karen Hao",r:"MIT Tech Review",l:"Jornalismo investigativo"}
+],
+flags:[
+"'Vai resolver tudo' ou 'vai destruir tudo' — sem nuance",
+"Ausência de fontes para claims fortes",
+"Conflito de interesse não declarado",
+"'IA senciente/consciente/que pensa' sem qualificação",
+"Previsões com datas precisas",
+"Demo impressionante ≠ capacidade geral confiável",
+"Só um lado do debate",
+"Press release disfarçado de artigo",
+"Zero discussão de limitações ou custos",
+"Anedotas no lugar de dados"
+],
+checklist:[
+{i:"Nunca colo senhas, CPFs, dados bancários ou docs sigilosos",c:"Privacidade"},
+{i:"Sei a política de dados da ferramenta",c:"Privacidade"},
+{i:"Verifico info de saúde, finanças e legal com fontes independentes",c:"Verificação"},
+{i:"Respostas de IA = rascunho, não resposta final",c:"Verificação"},
+{i:"Confiança demais = mais ceticismo",c:"Verificação"},
+{i:"Alto risco = supervisão humana qualificada",c:"Decisão"},
+{i:"IA amplifica meu julgamento, não substitui",c:"Decisão"},
+{i:"Sigo política de IA da empresa",c:"Profissional"},
+{i:"Transparente quando uso IA",c:"Profissional"},
+{i:"Reviso para viés antes de decisões que afetam outros",c:"Ética"}
+],
+deepDive:[
+{title:"Segurança e Alinhamento",color:"#2563EB",items:["Human Compatible (completo) — Russell","The Alignment Problem — Christian","Superintelligence — Bostrom","AI: Unexplainable... — Yampolskiy","Lex Fridman: Russell, Bengio, Amodei"]},
+{title:"Ética e Impacto Social",color:"#DC2626",items:["Atlas of AI (completo) — Crawford","Stochastic Parrots — Bender/Gebru","Race After Technology — Ruha Benjamin","WMD (completo) — O'Neil","Karen Hao (MIT Tech Review, Atlantic)"]},
+{title:"Governança e Regulação",color:"#059669",items:["The Coming Wave (completo) — Suleyman","AI Superpowers (completo) — Lee","Chokepoints — Fishman","EU AI Act (resumo oficial)","PL 2338/2023 (Brasil)"]},
+{title:"Geopolítica e Infraestrutura",color:"#0891B2",items:["Chip War (completo) — Miller","The Thinking Machine — Witt","Empire of AI — Hao","Asianometry (playlist semicondutores)","IEA Report 2025 (completo)"]},
+{title:"Uso Profissional Avançado",color:"#D97706",items:["Co-Intelligence — Ethan Mollick","Gen AI for Everyone (completo) — Ng","Anthropic Guide (completo)","HBR série IA no trabalho","Google AI Essentials (completo)"]}
+],
+fieldMap:{
+consensos:[
+{text:"LLMs geram texto por previsão probabilística, não 'compreensão'",authors:"Ng, Karpathy, Mitchell, Bengio"},
+{text:"Viés algorítmico é real, documentado e significativo",authors:"O'Neil, Crawford, Gebru, Bengio"},
+{text:"Alucinação é propriedade real e consequente",authors:"Ng, Mitchell, Bender"},
+{text:"Concentração de poder em poucas empresas é preocupação legítima",authors:"Crawford, Suleyman, Bengio, Gebru"},
+{text:"Regulação é necessária (discorda-se sobre forma/timing)",authors:"Suleyman, Bengio, Russell, Ng (parcial)"},
+{text:"Custo energético é significativo e crescente",authors:"IEA, Crawford"}
+],
+disputas:[
+{text:"LLMs 'entendem' em algum sentido relevante?",sides:"Parcialmente sim: Karpathy, capacidades emergentes · Não: Mitchell, Bender, Gebru"},
+{text:"Alucinação é bug solucionável ou estrutural?",sides:"Solucionável: Ng, Amodei · Estrutural: Mitchell, Bender"},
+{text:"Risco existencial é urgente ou distração?",sides:"Urgente: Russell, Bengio, Amodei · Prematuro: LeCun · Distração: Gebru, O'Neil"},
+{text:"'Basta escalar' para capacidades avançadas?",sides:"Sim: Sutton, Kaplan · Não: Marcus, Mitchell"},
+{text:"Regulação: inovação ou precaução primeiro?",sides:"Precaução: EU AI Act, Suleyman · Inovação: LeCun, startups EUA"},
+{text:"Quem deve controlar os modelos mais poderosos?",sides:"Empresas com oversight: Amodei · Open source: LeCun · Governos: Suleyman (parcial)"}
+],
+especulacoes:[
+{text:"Superinteligência nas próximas décadas",authors:"Aschenbrenner (otimista), Bostrom (alerta), LeCun (cético)"},
+{text:"IA pode tornar-se impossível de controlar",authors:"Yampolskiy (sim), Russell (risco real), LeCun (exagero)"},
+{text:"IA vai substituir maioria dos empregos",authors:"Susskind, Aschenbrenner · Contra: Ng, Lee ('depende de política')"},
+{text:"Corrida armamentista em IA é inevitável",authors:"Aschenbrenner, Miller · Contra: Bengio (cooperação possível)"},
+{text:"Controles de exportação vão conter avanço chinês",authors:"Debate aberto — evidência mista"}
+]
+}};
+
+const TI={"curso":"🎓","livro":"📖","youtube":"▶️","ensaio":"📝","guia":"📋","jornalismo":"📰","relatório":"📊","newsletter":"📬","podcast":"🎧"};
+const HL={"central":{bg:"#DBEAFE",color:"#1E40AF",label:"Central"},"nuance":{bg:"#FEF3C7",color:"#92400E",label:"Nuance"},"aprofundamento":{bg:"#EDE9FE",color:"#5B21B6",label:"Aprofundamento"}};
+let currentView="timeline";let selectedWeek=null;
+
+function render(){
+const app=document.getElementById("app");
+if(currentView==="final"){app.innerHTML=renderFinal();bindBack("timeline");return}
+if(currentView==="deep"){app.innerHTML=renderDeep();bindBack("timeline");return}
+if(currentView==="map"){app.innerHTML=renderMap();bindBack("timeline");return}
+if(currentView==="cal"){app.innerHTML=renderCal();bindBack("timeline");return}
+if(selectedWeek!==null){app.innerHTML=renderWeekDetail(W[selectedWeek]);bindWeekEvents();return}
+app.innerHTML=renderTimeline();bindTimelineEvents();
+}
+function noteCount(){return Object.values(notes).filter(v=>v&&v.trim()).length}
+function wnc(id){return[`w${id}-practice`,`w${id}-deliverable`,`w${id}-check0`,`w${id}-check1`,`w${id}-check2`].filter(k=>notes[k]&&notes[k].trim()).length}
+
+function renderTimeline(){
+const n=noteCount();
+let h=`<div style="text-align:center;margin-bottom:32px" class="fade-in">
+<div class="header-badge">Trilha de Estudo · 12 semanas · 3–5h/semana</div>
+<h1 style="font-size:30px;font-weight:800;color:#111827;margin:12px 0 8px;line-height:1.2">Inteligência Artificial<br>para Não-Técnicos</h1>
+<p style="font-size:14px;color:#6B7280;line-height:1.6;max-width:520px;margin:0 auto">Profundidade real, repertório sólido, senso crítico. Hierarquia de conceitos, divergências mapeadas, prática com entregável.</p>
+<div style="margin-top:14px">
+<span class="stats-badge" style="color:#1E40AF;background:#DBEAFE">24 obrigatórios</span>
+<span class="stats-badge" style="color:#7C3AED;background:#EDE9FE">12 entregáveis</span>
+<span class="stats-badge" style="color:#059669;background:#D1FAE5">5 sínteses</span>
+${n>0?`<span class="stats-badge" style="color:#D97706;background:#FEF3C7">✏️ ${n} anotações</span>`:""}
+</div></div>`;
+
+// Calendar button
+h+=`<div style="margin-bottom:24px"><button onclick="currentView='cal';render()" style="width:100%;padding:14px 18px;background:linear-gradient(135deg,#1E40AF,#1E3A8A);border-radius:12px;border:none;cursor:pointer;color:#fff;text-align:left;display:flex;align-items:center;gap:12px;transition:transform .2s" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform='none'"><span style="font-size:24px">📅</span><div><div style="font-size:15px;font-weight:700;font-family:Georgia,serif">Calendário · 1/abr – 23/jun 2026</div><div style="font-size:12px;opacity:.8;margin-top:2px">Rotina semanal com datas, horários e ordem de estudo</div></div></button></div>`;
+
+h+=`<div style="position:relative;padding-left:32px"><div class="timeline-line"></div>`;
+let lp="";
+W.forEach((w,idx)=>{
+if(w.phase!==lp){h+=`<div style="margin-bottom:8px;margin-left:16px" class="slide-in"><div class="phase-label" style="color:${w.pc}">${w.phase}</div></div>`;lp=w.phase}
+const wn=wnc(w.id),hasSynth=!!w.synthesis;
+h+=`<div style="position:relative;margin-bottom:12px;cursor:pointer" class="slide-in" data-week="${idx}">
+<div class="dot" style="background:${w.pc};box-shadow:0 0 0 3px white,0 0 0 5px ${w.pc}30">${w.id}</div>
+<div class="week-card" id="wc-${idx}">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+<div style="flex:1"><h3 style="font-size:17px;font-weight:700;color:#111827;margin:0 0 4px">${w.title}</h3>
+<p style="font-size:13px;color:#6B7280;margin:0;line-height:1.4">${w.obj.slice(0,110)}...</p></div>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+<div style="font-size:12px;color:${w.pc};font-weight:700;white-space:nowrap">${w.tt} →</div>
+${wn>0?`<div style="font-size:11px;color:#D97706;font-weight:600">✏️ ${wn}/5</div>`:""}</div></div>
+<div style="margin-top:8px">
+<span class="tag" style="color:#1E40AF;background:#DBEAFE">${w.req.length} obrig.</span>
+<span class="tag" style="color:#059669;background:#D1FAE5">entregável</span>
+${hasSynth?`<span class="tag" style="color:#6D28D9;background:#EDE9FE">síntese</span>`:""}
+</div></div></div>`;
+});
+h+=`</div>`;
+h+=`<button class="final-btn" id="final-btn"><div style="font-size:18px;font-weight:800;font-family:Georgia,serif">Material de Referência</div><div style="font-size:13px;opacity:.85;margin-top:4px">10 conceitos · Fontes · Alertas · Checklist</div></button>`;
+h+=`<button class="deep-btn" style="background:linear-gradient(135deg,#0F766E,#115E59)" id="map-btn"><div style="font-size:16px;font-weight:800;font-family:Georgia,serif">Mapa do Campo de IA</div><div style="font-size:13px;opacity:.85;margin-top:4px">Consensos · Disputas · Especulações</div></button>`;
+h+=`<button class="deep-btn" style="background:linear-gradient(135deg,#92400E,#78350F)" id="deep-btn"><div style="font-size:16px;font-weight:800;font-family:Georgia,serif">Aprofundamento Dirigido</div><div style="font-size:13px;opacity:.85;margin-top:4px">5 trilhas temáticas</div></button>`;
+h+=`<div style="text-align:center;margin-top:20px;font-size:12px;color:#9CA3AF">Trilha criada em março de 2026</div>`;
+return h;
+}
+
+function renderCal(){
+let h=`<div class="fade-in"><button class="back-btn" id="back-btn">← Voltar</button>`;
+h+=`<h2 style="font-size:26px;font-weight:800;color:#111827;margin-bottom:4px">Calendário de Estudo</h2>`;
+h+=`<p style="font-size:14px;color:#6B7280;margin-bottom:4px">1 de abril – 23 de junho de 2026 · Manhãs cedo · 3–5h/semana</p>`;
+h+=`<div style="background:#EFF6FF;border-radius:10px;padding:12px 16px;margin-bottom:20px;border:1px solid #BFDBFE;font-size:13px;color:#1E40AF;line-height:1.6">
+<strong>Sua rotina:</strong> Semanas 1–6 começam com prática na segunda (15–30min), teoria no meio da semana, consolidação no sábado. Semanas 7–12 começam com leitura, prática depois. Sábado é sempre dia de entregável + feedback no Claude (conversa nova por semana: "Trilha IA — Semana X").</div>`;
+W.forEach((w,idx)=>{
+const d=weekDates(idx);
+h+=`<div class="cal-week">
+<div class="cal-dot" style="background:${w.pc}">${w.id}</div>
+<div>
+<div class="cal-dates" style="color:${w.pc}">${d.label}</div>
+<div style="font-size:14px;font-weight:700;color:#111827;margin:2px 0 4px">${w.title}</div>
+<div style="display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:${w.order==='prática primeiro'?'#FEF3C7':'#DBEAFE'};color:${w.order==='prática primeiro'?'#92400E':'#1E40AF'};margin-bottom:6px">${w.order}</div>
+<div class="cal-sched">${w.schedule}</div>
+</div></div>`;
+});
+h+=`<div style="margin-top:20px;background:#F0FDF4;border-radius:10px;padding:14px 16px;border:1px solid #BBF7D0;font-size:13px;color:#166534;line-height:1.6">
+<strong>Semana mínima viável</strong> (quando tudo der errado): leia os conceitos + escreva o entregável. 30–45 min. Melhor que pular.<br><br>
+<strong>Se precisar pausar:</strong> não volte ao começo. Volte para onde parou. Cada semana é autocontida.<br><br>
+<strong>Marco motivacional:</strong> ao final da semana 6 (13/mai), você terá protocolo de uso + mini-guia de prompting. Documentos que vai usar de verdade.</div>`;
+h+=`</div>`;
+return h;
+}
+
+function renderWeekDetail(w){
+let h=`<div class="fade-in"><button class="back-btn" id="back-btn">← Voltar</button>`;
+const d=weekDates(w.id-1);
+h+=`<div style="background:linear-gradient(135deg,${w.pc}10,${w.pc}05);border:2px solid ${w.pc}30;border-radius:16px;padding:28px 24px;margin-bottom:24px">
+<div style="font-size:12px;font-weight:700;color:${w.pc};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Semana ${w.id} · ${d.label} · ${w.phase} · ${w.tt}</div>
+<h2 style="font-size:24px;font-weight:800;color:#111827;margin:4px 0 8px">${w.title}</h2>
+<div style="display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:${w.order==='prática primeiro'?'#FEF3C7':'#DBEAFE'};color:${w.order==='prática primeiro'?'#92400E':'#1E40AF'};margin-bottom:8px">${w.order}</div>
+<p style="font-size:15px;color:#374151;line-height:1.6;margin:0">${w.obj}</p></div>`;
+
+// Schedule
+h+=`<div style="background:#F9FAFB;border-radius:12px;padding:14px 18px;margin-bottom:20px;border:1px solid #E5E7EB">
+<h3 style="font-size:12px;font-weight:700;color:#111827;margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px">📅 Rotina desta semana</h3>
+<div style="font-size:13px;color:#374151;line-height:1.7">${w.schedule}</div></div>`;
+
+// Concepts
+h+=`<div style="background:#F9FAFB;border-radius:12px;padding:18px 20px;margin-bottom:24px;border:1px solid #E5E7EB">
+<h3 style="font-size:13px;font-weight:700;color:#111827;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px">Hierarquia de Conceitos</h3>`;
+w.concepts.forEach(c=>{
+const lv=HL[c.level],st=ST[c.status];
+h+=`<div style="margin-bottom:10px;padding-left:12px;border-left:2px solid ${w.pc}40">
+<span class="hierarchy-label" style="background:${lv.bg};color:${lv.color}">${lv.label}</span>
+<span class="status-tag" style="background:${st.bg};color:${st.color}">${st.label}</span>
+<div style="font-size:14px;color:#374151;line-height:1.5;margin-top:4px">${c.text}</div></div>`;
+});
+h+=`</div>`;
+
+h+=`<h3 style="font-size:14px;font-weight:700;color:#111827;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px">📌 Recursos Obrigatórios</h3>`;
+w.req.forEach(r=>{
+h+=`<div class="resource-card" style="border:1.5px solid ${w.pc}30">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+<span class="badge" style="color:#fff;background:${w.pc}">Obrigatório</span>
+<span style="font-size:12px;color:#6B7280">${TI[r.t]||"📌"} ${r.t} · ${r.time}</span>
+<span class="badge" style="color:${r.free?"#065F46":"#92400E"};background:${r.free?"#D1FAE5":"#FEF3C7"}">${r.free?"Gratuito":"Compra"}</span></div>
+<div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:4px">${r.url?`<a href="${r.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;border-bottom:1px dashed #9CA3AF">${r.n} ↗</a>`:r.n}</div>
+<div style="font-size:12px;color:#6B7280;margin-bottom:8px">${r.a}</div>
+<div style="font-size:13px;color:#374151;line-height:1.6;background:#F9FAFB;padding:10px 12px;border-radius:8px;margin-bottom:8px"><strong style="color:${w.pc}">Por que:</strong> ${r.why}</div>
+<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"><span class="lens-tag" style="background:#E0E7FF;color:#3730A3">🔍 ${r.lens}</span></div>
+<div class="ri" style="background:#FFF7ED;border:1px solid #FED7AA"><strong style="color:#9A3412">Limitação:</strong> ${r.limit}</div>
+<div class="ri" style="background:#F0FDF4;border:1px solid #BBF7D0"><strong style="color:#166534">Tensão:</strong> ${r.tension}</div></div>`;
+});
+if(w.opt.length){
+h+=`<h3 style="font-size:14px;font-weight:700;color:#6B7280;margin:20px 0 12px;text-transform:uppercase;letter-spacing:.5px">Opcionais</h3>`;
+w.opt.forEach(r=>{h+=`<div class="resource-opt"><div style="font-size:14px;font-weight:600;color:#374151">${r.url?`<a href="${r.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;border-bottom:1px dashed #D1D5DB">${r.n} ↗</a>`:r.n}</div><div style="font-size:12px;color:#6B7280">${r.a} · ${r.t} · ${r.time}${r.free===0?" · Compra":""}</div></div>`});
+}
+h+=`<div class="section-box" style="background:#FFFBEB;border:1px solid #FDE68A;margin-top:24px"><h3 style="font-size:13px;font-weight:700;color:#92400E;margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px">🔨 Atividade Prática</h3><div style="font-size:14px;color:#374151;line-height:1.6">${w.practice}</div></div>`;
+h+=`<div class="note-area"><textarea id="note-practice" placeholder="Suas observações...">${notes[`w${w.id}-practice`]||""}</textarea></div>`;
+h+=`<div class="section-box" style="background:#EFF6FF;border:1px solid #BFDBFE"><h3 style="font-size:13px;font-weight:700;color:#1E40AF;margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px">📦 Entregável</h3><div style="font-size:14px;color:#374151;line-height:1.6">${w.deliv}</div></div>`;
+h+=`<div class="note-area"><textarea id="note-deliv" placeholder="Escreva aqui...">${notes[`w${w.id}-deliverable`]||""}</textarea></div>`;
+h+=`<div class="section-box" style="background:#F0FDF4;border:1px solid #BBF7D0"><h3 style="font-size:13px;font-weight:700;color:#166534;margin:0 0 10px;text-transform:uppercase;letter-spacing:.5px">✅ Checagem Analítica</h3>`;
+w.checks.forEach((q,i)=>{h+=`<div style="margin-bottom:14px"><div style="font-size:14px;color:#374151;line-height:1.5;padding-left:12px;border-left:2px solid #22C55E;margin-bottom:6px">${q}</div><div style="padding-left:12px"><textarea id="note-check${i}" placeholder="Sua resposta...">${notes[`w${w.id}-check${i}`]||""}</textarea></div></div>`});
+h+=`</div>`;
+if(w.synthesis){const s=w.synthesis;
+h+=`<div class="synth-box" style="border-color:${w.pc};background:linear-gradient(135deg,${w.pc}08,${w.pc}03)">
+<h3 style="font-size:15px;font-weight:800;color:${w.pc};margin:0 0 14px;font-family:Georgia,serif">${s.title}</h3>
+<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:#065F46;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">✓ O que deve ter entendido</div><div style="font-size:14px;color:#374151;line-height:1.6">${s.understood}</div></div>
+<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">⟷ Tensões e status epistêmico</div><div style="font-size:14px;color:#374151;line-height:1.6">${s.tensions}</div></div>
+<div><div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">🔄 Compare</div><div style="font-size:14px;color:#374151;line-height:1.6">${s.compare}</div></div></div>`;}
+h+=`</div>`;return h;
+}
+
+function renderFinal(){
+let h=`<div class="fade-in"><button class="back-btn" id="back-btn">← Voltar</button>`;
+h+=`<h2 style="font-size:26px;font-weight:800;color:#111827;margin-bottom:24px">Material de Referência</h2>`;
+h+=`<div class="final-card" style="background:#EFF6FF;border:1px solid #BFDBFE"><h3 style="font-size:15px;font-weight:700;color:#1E40AF;margin:0 0 16px">🧠 10 Conceitos</h3>`;
+FL.concepts.forEach((c,i)=>{h+=`<div style="margin-bottom:10px"><div style="font-size:14px;font-weight:700;color:#111827">${i+1}. ${c.c}</div><div style="font-size:13px;color:#4B5563;margin-top:2px">${c.d}</div></div>`});
+h+=`</div>`;
+h+=`<div class="final-card" style="background:#F0FDF4;border:1px solid #BBF7D0"><h3 style="font-size:15px;font-weight:700;color:#166534;margin:0 0 16px">👤 Fontes (com lentes)</h3>`;
+FL.sources.forEach(s=>{h+=`<div style="margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:14px;font-weight:700">${s.n}</span><span class="lens-tag" style="background:#E0E7FF;color:#3730A3">${s.l}</span></div><div style="font-size:13px;color:#4B5563;margin-top:2px">${s.r}</div></div>`});
+h+=`</div>`;
+h+=`<div class="final-card" style="background:#FEF2F2;border:1px solid #FECACA"><h3 style="font-size:15px;font-weight:700;color:#991B1B;margin:0 0 16px">🚩 Sinais de Alerta</h3>`;
+FL.flags.forEach(f=>{h+=`<div style="font-size:14px;color:#374151;padding-left:12px;border-left:2px solid #EF4444;margin-bottom:8px">${f}</div>`});
+h+=`</div>`;
+h+=`<div class="final-card" style="background:#FFFBEB;border:1px solid #FDE68A"><h3 style="font-size:15px;font-weight:700;color:#92400E;margin:0 0 16px">🛡️ Checklist</h3>`;
+let lc="";FL.checklist.forEach(s=>{if(s.c!==lc){h+=`<div style="font-size:12px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.5px;margin:${lc?"14px":"0"} 0 6px">${s.c}</div>`;lc=s.c}h+=`<div style="font-size:14px;color:#374151;padding-left:12px;border-left:2px solid #F59E0B;margin-bottom:4px">☐ ${s.i}</div>`});
+h+=`</div></div>`;return h;
+}
+
+function renderMap(){
+const fm=FL.fieldMap;
+let h=`<div class="fade-in"><button class="back-btn" id="back-btn">← Voltar</button>`;
+h+=`<h2 style="font-size:26px;font-weight:800;color:#111827;margin-bottom:8px">Mapa do Campo de IA</h2>`;
+h+=`<p style="font-size:14px;color:#6B7280;margin-bottom:24px">Consensual, disputado, especulativo — com autores que representam cada posição.</p>`;
+h+=`<div class="final-card" style="background:#F0FDF4;border:1.5px solid #86EFAC">
+<h3 style="font-size:16px;font-weight:700;color:#166534;margin:0 0 4px">Consensos</h3>
+<p style="font-size:12px;color:#6B7280;margin:0 0 16px">Acordo amplo entre pesquisadores sérios.</p>`;
+fm.consensos.forEach(c=>{h+=`<div class="map-item" style="border-left:3px solid #22C55E"><strong>${c.text}</strong><br><span style="font-size:12px;color:#6B7280">${c.authors}</span></div>`});
+h+=`</div>`;
+h+=`<div class="final-card" style="background:#FFFBEB;border:1.5px solid #FCD34D">
+<h3 style="font-size:16px;font-weight:700;color:#92400E;margin:0 0 4px">Disputas</h3>
+<p style="font-size:12px;color:#6B7280;margin:0 0 16px">Debates reais, ambos os lados com argumentos substanciais.</p>`;
+fm.disputas.forEach(d=>{h+=`<div class="map-item" style="border-left:3px solid #F59E0B"><strong>${d.text}</strong><br><span style="font-size:12px;color:#6B7280">${d.sides}</span></div>`});
+h+=`</div>`;
+h+=`<div class="final-card" style="background:#FEF2F2;border:1.5px solid #FCA5A5">
+<h3 style="font-size:16px;font-weight:700;color:#991B1B;margin:0 0 4px">Especulações Recorrentes</h3>
+<p style="font-size:12px;color:#6B7280;margin:0 0 16px">Pressupostos não comprovados ou timelines incertas. Podem ser informadas, não são consenso.</p>`;
+fm.especulacoes.forEach(s=>{h+=`<div class="map-item" style="border-left:3px solid #EF4444"><strong>${s.text}</strong><br><span style="font-size:12px;color:#6B7280">${s.authors}</span></div>`});
+h+=`</div>`;
+h+=`<div style="background:#F9FAFB;border-radius:12px;padding:16px 20px;border:1px solid #E5E7EB;font-size:13px;color:#374151;line-height:1.7">
+<strong>Como ler:</strong> <span style="color:#22C55E;font-weight:700">Verde</span> = maioria concorda. <span style="color:#F59E0B;font-weight:700">Amarelo</span> = debate real entre qualificados. <span style="color:#EF4444;font-weight:700">Vermelho</span> = recorrente mas sem base comprovada.<br>
+<strong>Regra:</strong> especulação apresentada como consenso, ou consenso como opinião → desconfie.</div></div>`;
+return h;
+}
+
+function renderDeep(){
+let h=`<div class="fade-in"><button class="back-btn" id="back-btn">← Voltar</button>`;
+h+=`<h2 style="font-size:26px;font-weight:800;color:#111827;margin-bottom:8px">Aprofundamento Dirigido</h2>`;
+h+=`<p style="font-size:14px;color:#6B7280;margin-bottom:24px">Cinco trilhas para ir mais fundo.</p>`;
+FL.deepDive.forEach(d=>{
+h+=`<div class="final-card" style="background:${d.color}06;border:1.5px solid ${d.color}25">
+<h3 style="font-size:16px;font-weight:700;color:${d.color};margin:0 0 12px">${d.title}</h3>`;
+d.items.forEach(it=>{h+=`<div style="font-size:14px;color:#374151;padding-left:12px;border-left:2px solid ${d.color}40;margin-bottom:8px">${it}</div>`});
+h+=`</div>`;});
+h+=`</div>`;return h;
+}
+
+function bindBack(t){document.getElementById("back-btn").addEventListener("click",()=>{if(selectedWeek!==null)saveNotes(W[selectedWeek].id);selectedWeek=null;currentView=t;render();window.scrollTo(0,0)})}
+function saveNotes(wid){const p=document.getElementById("note-practice"),d=document.getElementById("note-deliv");if(p)notes[`w${wid}-practice`]=p.value;if(d)notes[`w${wid}-deliverable`]=d.value;for(let i=0;i<3;i++){const el=document.getElementById(`note-check${i}`);if(el)notes[`w${wid}-check${i}`]=el.value}saveAllNotes()}
+
+function bindTimelineEvents(){
+document.querySelectorAll("[data-week]").forEach(el=>{
+el.addEventListener("click",()=>{selectedWeek=parseInt(el.dataset.week);render()});
+const card=el.querySelector(".week-card"),w=W[parseInt(el.dataset.week)];
+el.addEventListener("mouseenter",()=>{if(card)card.style.borderColor=w.pc});
+el.addEventListener("mouseleave",()=>{if(card)card.style.borderColor="#E5E7EB"});
+});
+document.getElementById("final-btn").addEventListener("click",()=>{currentView="final";render()});
+document.getElementById("deep-btn").addEventListener("click",()=>{currentView="deep";render()});
+document.getElementById("map-btn").addEventListener("click",()=>{currentView="map";render()});
+}
+
+function bindWeekEvents(){
+document.getElementById("back-btn").addEventListener("click",()=>{if(selectedWeek!==null)saveNotes(W[selectedWeek].id);selectedWeek=null;render();window.scrollTo(0,0)});
+const wid=W[selectedWeek].id;
+["note-practice","note-deliv","note-check0","note-check1","note-check2"].forEach(id=>{const el=document.getElementById(id);if(el){const key=id==="note-practice"?`w${wid}-practice`:id==="note-deliv"?`w${wid}-deliverable`:`w${wid}-check${id.slice(-1)}`;el.addEventListener("input",()=>{notes[key]=el.value;debounceSave()})}});
+}
+render();
+</script>
+</body>
+</html>
