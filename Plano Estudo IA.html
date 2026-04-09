@@ -88,7 +88,7 @@ concepts:[
 {text:"O papel central da qualidade e quantidade de dados no desempenho",level:"aprofundamento",status:"C"}
 ],
 req:[
-{n:"AI For Everyone — módulos 1 e 2",a:"Andrew Ng (Stanford / Google Brain)",t:"curso",free:1,url:"https://coursera.org/learn/ai-for-everyone",time:"1h30",
+{n:"AI For Everyone — módulos 1 e 2",a:"Andrew Ng (Stanford / Google Brain)",t:"curso",pfree:1,url:"https://imp.i384100.net/rEg3ay",time:"1h30",
 why:"Melhor curso introdutório para não-técnicos. Ng fundou o Google Brain — pedagogia excepcionalmente clara.",
 lens:"Construtor / educador mainstream",
 limit:"Otimista tecnológico. Enfatiza oportunidades sobre riscos sociais.",
@@ -736,7 +736,7 @@ h+=`<div class="resource-card" style="border:1.5px solid ${w.pc}30">
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
 <span class="badge" style="color:#fff;background:${w.pc}">Obrigatório</span>
 <span style="font-size:12px;color:#6B7280">${TI[r.t]||"📌"} ${r.t} · ${r.time}</span>
-<span class="badge" style="color:${r.free?"#065F46":"#92400E"};background:${r.free?"#D1FAE5":"#FEF3C7"}">${r.free?"Gratuito":"Compra"}</span></div>
+<span class="badge" style="color:${r.pfree?"#1E40AF":r.free?"#065F46":"#92400E"};background:${r.pfree?"#DBEAFE":r.free?"#D1FAE5":"#FEF3C7"}">${r.pfree?"Parcialmente gratuito":r.free?"Gratuito":"Compra"}</span>
 <div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:4px">${r.url?`<a href="${r.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;border-bottom:1px dashed #9CA3AF">${r.n} ↗</a>`:r.n}</div>
 <div style="font-size:12px;color:#6B7280;margin-bottom:8px">${r.a}</div>
 <div style="font-size:13px;color:#374151;line-height:1.6;background:#F9FAFB;padding:10px 12px;border-radius:8px;margin-bottom:8px"><strong style="color:${w.pc}">Por que:</strong> ${r.why}</div>
